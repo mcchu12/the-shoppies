@@ -2,18 +2,15 @@ import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
 import Layout from './Layout';
-
-const Home = () => {
-  return <div>Home</div>;
-};
+import Home from './Home';
 
 const Routes = () => {
   return (
     <BrowserRouter>
       <Layout>
         <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/" component={Home} />
+          <Route exact path="/search" component={() => <div>Search</div>} />
+          <Route exact path="/" component={Home} />
         </Switch>
       </Layout>
     </BrowserRouter>
