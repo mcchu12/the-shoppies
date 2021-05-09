@@ -7,9 +7,11 @@ import {
   Typography,
   IconButton,
   Tooltip,
+  Hidden,
 } from '@material-ui/core';
 import DarkIcon from '@material-ui/icons/Brightness4';
 import LightIcon from '@material-ui/icons/Brightness7';
+import BookmarksIcon from '@material-ui/icons/Bookmarks';
 import LogoIcon from './logo.svg';
 
 type Props = {
@@ -30,14 +32,24 @@ const Header: FC<Props> = ({ isDark, onModeSwitch }) => {
           </Typography>
         </Link>
 
-        <Tooltip title="Toggle light/dark theme">
-          <IconButton
-            aria-label="dark/light theme switch"
-            onClick={onModeSwitch}
-          >
-            {isDark ? <LightIcon /> : <DarkIcon />}
-          </IconButton>
-        </Tooltip>
+        <div>
+          <Tooltip title="Toggle light/dark theme">
+            <IconButton
+              aria-label="dark/light theme switch"
+              onClick={onModeSwitch}
+            >
+              {isDark ? <LightIcon /> : <DarkIcon />}
+            </IconButton>
+          </Tooltip>
+
+          <Hidden mdUp>
+            <Tooltip title="Nomination lists">
+              <IconButton>
+                <BookmarksIcon />
+              </IconButton>
+            </Tooltip>
+          </Hidden>
+        </div>
       </Toolbar>
     </AppBar>
   );

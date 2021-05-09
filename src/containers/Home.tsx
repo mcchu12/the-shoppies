@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, makeStyles, Typography } from '@material-ui/core';
 import { Link } from 'react-router-dom';
+
 const Home = () => {
   const classes = useStyles();
   return (
@@ -15,7 +16,7 @@ const Home = () => {
         </Typography>
       </div>
 
-      <Link to="/search">
+      <Link to="/movies">
         <Button variant="contained" color="primary" size="large">
           Get started
         </Button>
@@ -30,7 +31,7 @@ const useStyles = makeStyles(
   (theme) => ({
     root: {
       margin: theme.spacing('auto', 1),
-      height: '100%',
+      height: 'calc(100vh - 80px)',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
