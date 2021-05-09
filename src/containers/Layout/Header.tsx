@@ -10,6 +10,7 @@ import {
   Hidden,
   Divider,
   Drawer,
+  Badge,
 } from '@material-ui/core';
 import { nominationDeleted } from '../../features/movies/moviesSlice';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
@@ -44,7 +45,7 @@ const Header: FC<Props> = ({ isDark, onModeSwitch }) => {
     </Link>
   );
 
-  const renderIcon = () => (
+  const renderIcons = () => (
     <div>
       <Tooltip title="Toggle light/dark theme">
         <IconButton aria-label="dark/light theme switch" onClick={onModeSwitch}>
@@ -55,7 +56,13 @@ const Header: FC<Props> = ({ isDark, onModeSwitch }) => {
       <Hidden mdUp>
         <Tooltip title="Nomination lists">
           <IconButton onClick={() => setDrawerOpen(true)}>
-            <BookmarksIcon />
+            <Badge
+              variant="dot"
+              badgeContent={nominations.length}
+              color="primary"
+            >
+              <BookmarksIcon />
+            </Badge>
           </IconButton>
         </Tooltip>
       </Hidden>
@@ -99,7 +106,7 @@ const Header: FC<Props> = ({ isDark, onModeSwitch }) => {
     <AppBar position="fixed" elevation={0} color="inherit">
       <Toolbar className={classes.toolbar}>
         {renderLogo()}
-        {renderIcon()}
+        {renderIcons()}
       </Toolbar>
 
       {renderDrawer()}
