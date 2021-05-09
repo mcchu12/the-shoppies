@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useMemo } from 'react';
 import {
   ThemeProvider,
   Box,
@@ -7,18 +7,28 @@ import {
 } from '@material-ui/core';
 import Header from './Header';
 import createTheme from '../../theme';
+import { getSavedThemeMode, saveThemeMode } from '../../theme/utils';
 
 const Layout: FC = ({ children }) => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [isDark, setDarkTheme] = useState<boolean>(prefersDarkMode);
-  const classes = useStyles();
+  const savedThemeMode = useMemo(() => getSavedThemeMode(), []);
+  const [isDark, setDarkTheme] = useState<boolean>(
+    savedThemeMode ? savedThemeMode === 'dark' : prefersDarkMode
+  );
+  const theme = useMemo(() => createTheme(isDark), [isDark]);
 
-  const theme = React.useMemo(() => createTheme(isDark), [isDark]);
+  const classes = useStyles();
 
   return (
     <ThemeProvider theme={theme}>
       <Box bgcolor="background.default" color="text.primary" minHeight="100vh">
-        <Header onModeSwitch={() => setDarkTheme(!isDark)} isDark={isDark} />
+        <Header
+          onModeSwitch={() => {
+            saveThemeMode(isDark ? 'light' : 'dark');
+            setDarkTheme(!isDark);
+          }}
+          isDark={isDark}
+        />
         <Box component="main">
           <section className={classes.section}>{children}</section>
         </Box>
