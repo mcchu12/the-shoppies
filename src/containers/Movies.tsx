@@ -10,16 +10,16 @@ import {
   Button,
   CircularProgress,
 } from '@material-ui/core';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
   clearQueries,
   searchMovieAsync,
   nominationAdded,
   nominationDeleted,
-} from '../../features/movies/moviesSlice';
-import MovieList from '../../components/MovieList';
-import MovieListItem from '../../components/MovieListItem';
-import Banner from '../../components/Banner';
+} from '../features/movies/moviesSlice';
+import MovieList from '../components/MovieList';
+import MovieListItem from '../components/MovieListItem';
+import Banner from '../components/Banner';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 type Props = {};
@@ -89,7 +89,7 @@ const Movies: FC<Props> = () => {
   };
 
   const renderNominationList = () => (
-    <Hidden mdDown>
+    <Hidden smDown>
       <Card className={classes.nominations}>
         <MovieList title="Nominations">
           {Object.values(nominations).map((movie, index) => (
