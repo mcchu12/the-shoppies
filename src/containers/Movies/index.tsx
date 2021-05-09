@@ -6,23 +6,29 @@ import {
   Box,
   Hidden,
   makeStyles,
-  Typography,
+  IconButton,
+  Button,
+  CircularProgress,
 } from '@material-ui/core';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
   clearQueries,
   searchMovieAsync,
+  nominationAdded,
+  nominationDeleted,
 } from '../../features/movies/moviesSlice';
 import MovieList from '../../components/MovieList';
+import MovieListItem from '../../components/MovieListItem';
+import Banner from '../../components/Banner';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 type Props = {};
 
 const Movies: FC<Props> = () => {
-  const [query, setQuery] = useState<string>('');
-  const searchResult = useAppSelector((state) => state.movies.queries);
-  const nominations = useAppSelector((state) =>
-    Object.values(state.movies.nominations)
+  const { queries, status, completed, nominations } = useAppSelector(
+    (state) => state.movies
   );
+  const [query, setQuery] = useState<string>('');
   const dispatch = useAppDispatch();
   const classes = useStyles();
 
@@ -42,6 +48,70 @@ const Movies: FC<Props> = () => {
     [dispatch]
   );
 
+  const renderSearchResult = () => {
+    return (
+      <Card className={classes.result}>
+        <Banner
+          isOpen={completed}
+          message="You have reached 5 nominations limit."
+        />
+        <MovieList
+          title={
+            <>
+              {`Search result ${query && `for "${query}":`}`}
+              {status === 'loading' && <CircularProgress />}
+            </>
+          }
+        >
+          {queries.map((movie, index) => {
+            return (
+              <MovieListItem
+                key={index}
+                movie={movie}
+                primaryAction={
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      dispatch(nominationAdded(movie));
+                    }}
+                    disabled={completed || (nominations[movie.Title] && true)}
+                  >
+                    Nominate
+                  </Button>
+                }
+              />
+            );
+          })}
+        </MovieList>
+      </Card>
+    );
+  };
+
+  const renderNominationList = () => (
+    <Hidden mdDown>
+      <Card className={classes.nominations}>
+        <MovieList title="Nominations">
+          {Object.values(nominations).map((movie, index) => (
+            <MovieListItem
+              key={index}
+              movie={movie}
+              secondaryAction={
+                <IconButton
+                  edge="end"
+                  aria-label="delete"
+                  onClick={() => dispatch(nominationDeleted(movie))}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              }
+            />
+          ))}
+        </MovieList>
+      </Card>
+    </Hidden>
+  );
+
   return (
     <Container maxWidth="lg">
       <TextField
@@ -55,18 +125,8 @@ const Movies: FC<Props> = () => {
       />
 
       <Box mt={4} display="flex">
-        <Card className={classes.result}>
-          <MovieList
-            title={`Search result ${query && `for "${query}":`}`}
-            movies={searchResult}
-            addAction
-          />
-        </Card>
-        <Hidden mdDown>
-          <Card className={classes.nominations}>
-            <MovieList title="Nominations" movies={nominations} removeAction />
-          </Card>
-        </Hidden>
+        {renderSearchResult()}
+        {renderNominationList()}
       </Box>
     </Container>
   );

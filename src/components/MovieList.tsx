@@ -1,103 +1,14 @@
-import React, { FC } from 'react';
-import {
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Typography,
-  Button,
-  IconButton,
-  makeStyles,
-} from '@material-ui/core';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import {
-  nominationAdded,
-  nominationDeleted,
-} from '../features/movies/moviesSlice';
+import React, { FC, ReactNode } from 'react';
+import { List, Typography } from '@material-ui/core';
 
-import DeleteIcon from '@material-ui/icons/Delete';
+type Props = { title: string | ReactNode };
 
-type Props = {
-  movies: Movie[];
-  title: string;
-  addAction?: boolean;
-  removeAction?: boolean;
-};
-
-const MovieList: FC<Props> = ({
-  movies,
-  title,
-  addAction = false,
-  removeAction = false,
-}) => {
-  const classes = useStyles();
-  const dispatch = useAppDispatch();
-  const nominations = useAppSelector((state) => state.movies.nominations);
-
-  const renderMovieItems = () => {
-    return movies.map((movie, index) => (
-      <ListItem key={index}>
-        <img
-          className={classes.poster}
-          src={
-            movie.Poster === 'N/A'
-              ? 'https://via.placeholder.com/300x450?text=shoppies'
-              : movie.Poster
-          }
-          alt={movie.Title}
-        />
-        <ListItemText>
-          <div className={classes.title}>
-            <Typography>{movie.Title}</Typography>
-            <Typography variant="body2" color="textSecondary">
-              {movie.Year}
-            </Typography>
-          </div>
-          {addAction && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                dispatch(nominationAdded(movie));
-              }}
-              disabled={nominations[movie.Title] && true}
-            >
-              Nominate
-            </Button>
-          )}
-        </ListItemText>
-        {removeAction && (
-          <ListItemSecondaryAction>
-            <IconButton
-              edge="end"
-              aria-label="delete"
-              onClick={() => dispatch(nominationDeleted(movie))}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </ListItemSecondaryAction>
-        )}
-      </ListItem>
-    ));
-  };
-
+const MovieList: FC<Props> = ({ title, children }) => {
   return (
     <List subheader={<Typography variant="h5">{title}</Typography>}>
-      {renderMovieItems()}
+      {children}
     </List>
   );
 };
 
 export default MovieList;
-
-const useStyles = makeStyles((theme) => ({
-  poster: {
-    objectFit: 'contain',
-    height: 150,
-    width: 100,
-    marginRight: theme.spacing(1),
-  },
-  title: {
-    marginBottom: theme.spacing(1),
-  },
-}));

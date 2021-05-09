@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   makeStyles,
@@ -8,11 +8,19 @@ import {
   IconButton,
   Tooltip,
   Hidden,
+  Divider,
+  Drawer,
 } from '@material-ui/core';
+import { nominationDeleted } from '../../features/movies/moviesSlice';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import MovieListItem from '../../components/MovieListItem';
+import MovieList from '../../components/MovieList';
+import LogoIcon from './logo.svg';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import DarkIcon from '@material-ui/icons/Brightness4';
 import LightIcon from '@material-ui/icons/Brightness7';
 import BookmarksIcon from '@material-ui/icons/Bookmarks';
-import LogoIcon from './logo.svg';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 type Props = {
   onModeSwitch: () => void;
@@ -20,37 +28,81 @@ type Props = {
 };
 
 const Header: FC<Props> = ({ isDark, onModeSwitch }) => {
+  const [isDrawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const nominations = useAppSelector((state) =>
+    Object.values(state.movies.nominations)
+  );
+  const dispatch = useAppDispatch();
   const classes = useStyles();
+
+  const renderLogo = () => (
+    <Link to="/" className={classes.logo}>
+      <img src={LogoIcon} alt="shoppies logo" />
+      <Typography variant="h5" color="textPrimary" display="inline">
+        shoppies
+      </Typography>
+    </Link>
+  );
+
+  const renderIcon = () => (
+    <div>
+      <Tooltip title="Toggle light/dark theme">
+        <IconButton aria-label="dark/light theme switch" onClick={onModeSwitch}>
+          {isDark ? <LightIcon /> : <DarkIcon />}
+        </IconButton>
+      </Tooltip>
+
+      <Hidden mdUp>
+        <Tooltip title="Nomination lists">
+          <IconButton onClick={() => setDrawerOpen(true)}>
+            <BookmarksIcon />
+          </IconButton>
+        </Tooltip>
+      </Hidden>
+    </div>
+  );
+
+  const renderDrawer = () => (
+    <Drawer
+      anchor="right"
+      open={isDrawerOpen}
+      PaperProps={{ className: classes.drawer }}
+      onClose={() => setDrawerOpen(false)}
+    >
+      <div>
+        <IconButton onClick={() => setDrawerOpen(false)}>
+          <ChevronRightIcon />
+        </IconButton>
+      </div>
+      <Divider className={classes.divider} />
+      <MovieList title="Nominations">
+        {Object.values(nominations).map((movie, index) => (
+          <MovieListItem
+            key={index}
+            movie={movie}
+            secondaryAction={
+              <IconButton
+                edge="end"
+                aria-label="delete"
+                onClick={() => dispatch(nominationDeleted(movie))}
+              >
+                <DeleteIcon />
+              </IconButton>
+            }
+          />
+        ))}
+      </MovieList>
+    </Drawer>
+  );
 
   return (
     <AppBar position="fixed" elevation={0} color="inherit">
       <Toolbar className={classes.toolbar}>
-        <Link to="/" className={classes.logo}>
-          <img src={LogoIcon} alt="shoppies logo" />
-          <Typography variant="h5" color="textPrimary" display="inline">
-            shoppies
-          </Typography>
-        </Link>
-
-        <div>
-          <Tooltip title="Toggle light/dark theme">
-            <IconButton
-              aria-label="dark/light theme switch"
-              onClick={onModeSwitch}
-            >
-              {isDark ? <LightIcon /> : <DarkIcon />}
-            </IconButton>
-          </Tooltip>
-
-          <Hidden mdUp>
-            <Tooltip title="Nomination lists">
-              <IconButton>
-                <BookmarksIcon />
-              </IconButton>
-            </Tooltip>
-          </Hidden>
-        </div>
+        {renderLogo()}
+        {renderIcon()}
       </Toolbar>
+
+      {renderDrawer()}
     </AppBar>
   );
 };
@@ -77,5 +129,17 @@ const useStyles = makeStyles((theme) => ({
     '& > *': {
       fontStyle: 'italic',
     },
+  },
+  drawer: {
+    padding: theme.spacing(1),
+    width: '100vw',
+
+    [theme.breakpoints.up('sm')]: {
+      width: 'auto',
+      minWidth: '400px',
+    },
+  },
+  divider: {
+    marginBottom: theme.spacing(2),
   },
 }));

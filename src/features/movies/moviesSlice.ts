@@ -7,12 +7,11 @@ const initialState: MoviesState = {
   queries: [],
   status: 'idle',
   nominations: nominations ? JSON.parse(nominations) : {},
+  completed: nominations ? Object.values(JSON.parse(nominations)).length === 5 : false
 };
 
 export const searchMovieAsync = createAsyncThunk('movies/searchMovie', async (title: string) => {
   const res = await fetchMovies(title);
-
-  // console.log(res);
 
   if (res.data.Response === "True") {
     return res.data.Search;
@@ -30,10 +29,12 @@ const moviesSlice = createSlice({
       state.queries = []
     },
     nominationAdded(state, action: PayloadAction<Movie>) {
+      if (Object.keys(state.nominations).length === 4) state.completed = true;
       state.nominations[action.payload.Title] = action.payload;
       localStorage.setItem('nominations', JSON.stringify(state.nominations))
     },
     nominationDeleted(state, action: PayloadAction<Movie>) {
+      if (state.completed) state.completed = false;
       delete state.nominations[action.payload.Title];
       localStorage.setItem('nominations', JSON.stringify(state.nominations))
     }
